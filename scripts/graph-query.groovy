@@ -88,7 +88,8 @@ getAll = {blockSize ->
             if (set_explored.containsValue(it) == false)
             {   
                 def cluster = getOne(it.uri);
-                if (cluster[0].size() > 1) {set_clusters.put(++idx_clusters, cluster);}
+                if ((cluster[0].size() > 1) && (cluster[1].size() > 1)) 
+                    {set_clusters.put(++idx_clusters, cluster);}
                 cluster[0].each {set_explored.put(++idx_explored, it);}
             }
             if (++lineNumber%blockSize == 0L){println "${lineNumber}/" + pool.size + " objects : " + getRunTime(startTime, System.currentTimeMillis())}
