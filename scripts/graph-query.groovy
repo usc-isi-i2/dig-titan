@@ -15,8 +15,9 @@ info = {
 
 getRunTime = {beginTime, endTime -> 
     //About:  returns duration between two moments
-    //Input:  timestamp1,  timestamp2
-    //Output: timestamp2 - timestamp1 in "hh:mm:ss.mss" format
+    //Input:  timestamp1: start point an interval
+    //        timestamp2: end point of an interval 
+    //Output: duration: interval length in "hh:mm:ss.mss" format
 
     def elapsedTime = endTime - beginTime
     def hh = elapsedTime.intdiv(3600000);
@@ -39,11 +40,10 @@ getRunTime = {beginTime, endTime ->
     return duration
 }
 
-
 getOne = {uri -> 
     //About:  detects a cluster - group of mutually connected objects (ads) and their shared properties (phones)
-    //Input:  URI of the initial object that belongs to the group
-    //Output: 2D-array of group properties: [X1, ..., Xm][Y1, ..., Yn] (set of advertisements and phone numbers)
+    //Input:  uri: URI of the initial object that belongs to the group
+    //Output: [ads, phones]: 2D-array of group properties: [X1, ..., Xm][Y1, ..., Yn] (set of advertisements and phone numbers)
     //        m - number of objects (ads) in the cluster
     //        n - number of shared properties (phone numbers)
 
@@ -54,11 +54,11 @@ getOne = {uri ->
     return [ads, phones];
 }
 
-
 getAll = {blockSize ->
     //About:  detects all clusters - groups of mutually connected objects (ads) and their shared properties (phones)
-    //Input:  display progress every "blockSize" lines
-    //Output: hashtable of cluster properties: [1 : [X1, ..., Xm][Y1, ..., Yn], ... k : [X1, ..., Xm][Y1, ..., Yn]]
+    //Input:  blockSize: number of lines to be processed between the progress display (default 100000)
+    //Output: N/A
+    //        hashtable of cluster properties: [1 : [X1, ..., Xm][Y1, ..., Yn], ... k : [X1, ..., Xm][Y1, ..., Yn]]
     //        m - number of objects (ads) in the cluster
     //        n - number of shared properties (phone numbers)
     //        k - total amount of clusters
@@ -96,7 +96,27 @@ getAll = {blockSize ->
         }
     }
     println "\nAnalysis completed: "+idx_clusters+" cluster(s) found\n";
-    return set_clusters;
+    //return set_clusters;
+}
+
+output = {mode, filename->
+    //About:  creates a text file with the results of complete graph search
+    //Input:  mode: the way for sorting search results
+    //        1 - sort by number of ads per cluster
+    //        2 - sort by number of phones per cluster (default)
+    //Output: N/A
+    
+    if (set_clusters.size() == 0)
+    {
+        getAll(1000);
+    }
+    //if (mode == null || mode == 0) {mode = 2};
+    //if (filename == null) {filename = "output/clusters.txt"};
+
+    filename = "output/" + filename;
+    if (filename.substring(filename.length()-4, filename.length()) != ".txt") {filename += ".txt"}
+    println "\nCreating file '" + filename + "'"
+
 }
 
 edge1 = '<http://memexproxy.com/ontology/hasFeatureCollection>';
@@ -104,4 +124,4 @@ edge2 = '<http://memexproxy.com/ontology/phonenumber_feature>';
 edge3 = '<http://memexproxy.com/ontology/featureObject>';
 
 graph = TitanFactory.open('conf/titan-berkeleydb.properties');
-println "\nGraph loaded successfullly. Type info() for help."
+println "\nGraph loaded successfully. Type info() for help."
