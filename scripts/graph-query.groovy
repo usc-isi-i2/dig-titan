@@ -117,8 +117,9 @@ output = {mode, filename->
     if (filename.substring(filename.length()-4, filename.length()) != ".txt") {filename += ".txt"}
     println "\nCreating file '" + filename + "'"
 
-    // CREATE ARRAY OF ADS GROUPPED BY CLUSTERS
-    // PRINT TO FILE
+    // 1. CREATE ARRAY OF ADS GROUPPED BY CLUSTERS
+    // 2. SORT THAT ARRAY
+    // 3. PRINT TO FILE
 }
 
 edge1 = '<http://memexproxy.com/ontology/hasFeatureCollection>';
