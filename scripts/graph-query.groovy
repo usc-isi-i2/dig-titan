@@ -87,10 +87,10 @@ getAll = {blockSize ->
             if (set_explored.containsValue(it) == false)
             {   
                 def cluster = getOne(it.uri);
-                //if ((cluster[0].size() > 1) && (cluster[1].size() > 1)) //UNCOMMENT
-                    //{
-                        set_clusters.put(++idx_clusters, cluster);
-                    //}
+                if ((cluster[0].size() > 1) && (cluster[1].size() > 1))
+                {
+                    set_clusters.put(++idx_clusters, cluster);
+                }
                 cluster[0].each {set_explored.put(++idx_explored, it);}
             }
             if (++lineNumber%blockSize == 0L){println "${lineNumber}/" + pool.size + " objects : " + getRunTime(startTime, System.currentTimeMillis())}
@@ -109,43 +109,38 @@ output = {mode, filename->
     if (set_clusters.size() == 0) {getAll(1000);}    
     set_clusters = set_clusters.sort{-it.value[mode].size}
     
-    filename = "output/" + filename;
+    def boolean overwrife_file = true;
     if (filename.substring(filename.length()-4, filename.length()) != ".txt") {filename += ".txt"}
-    println "\nCreating file '" + filename + "'\n"
-    
-    //def textFile = new File(filename);
-    for (int i = 1; i <= set_clusters.size(); i++)
+    def textFile = new File("output/"+filename);
+
+    if(textFile.exists())
     {
-        println "CLUSTER: " + i + "\n";
-        println "total phone numbers: \t"  + set_clusters.get(i)[1].size();
-        println "total advertisements: \t" + set_clusters.get(i)[0].size();
-        println "\nphones:";
-        set_clusters.get(i)[1].each{println it.uri;}
-        println "\nadvertisements:";
-        set_clusters.get(i)[0].each{println it.uri;}
-        println"————————————————————————————————————————————————————\n"
+        println "A file '" + filename + "' already exisits in the same folder. Overwrite it? [Y/N]"
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in))
+        String input;
+        while (input != "Y" && input != "y" && input != "N" && input != "n") 
+        {
+            input = br.readLine();
+        }
+        if (input == "N" || input == "n") {overwrife_file = false;}        
+    }   
+
+    if (overwrife_file == true)
+    {   
+        textFile.write "";
+        for (int i = 1; i <= set_clusters.size(); i++)
+        {
+            textFile.append "CLUSTER " + i + "\n\n";
+            textFile.append "total phone numbers: \t"  + set_clusters.get(i)[1].size() + "\n";
+            textFile.append "total advertisements: \t" + set_clusters.get(i)[0].size() + "\n";
+            textFile.append "\nphones:\n";
+            set_clusters.get(i)[1].each{textFile.append it.uri + "\n";}
+            textFile.append "\nadvertisements:\n";
+            set_clusters.get(i)[0].each{textFile.append it.uri + "\n";}
+            textFile.append"————————————————————————————————————————————————————\n"
+        }
+        println "\nFile '" + filename + " created."
     }
-    /*
-    array = [[],[]];
-    def sizes = [];
-    def idxes = [];
-    
-    for (int i = 1; i <= set_clusters.size(); i++)
-    {
-        idxes[i] = i;
-        sizes[i] = set_clusters.get(i)[mode].size();
-
-        array[0] = array[0] + i;
-    }
-    array = [idxes, sizes]
-    */
-
-    
-
-
-    // 1. CREATE ARRAY OF ADS GROUPPED BY CLUSTERS
-    // 2. SORT THAT ARRAY
-    // 3. PRINT TO FILE
 }
 
 edge1 = '<http://memexproxy.com/ontology/hasFeatureCollection>';
