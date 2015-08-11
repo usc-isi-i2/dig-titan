@@ -106,18 +106,25 @@ output = {mode, filename->
     //        1 - sort by number of phones per cluster (default)
     //Output: N/A
     
-    if (set_clusters.size() == 0)
-    {
-        getAll(1000);
-    }
-    //if (mode == null || mode == 0) {mode = 2};
-    //if (filename == null) {filename = "output/clusters.txt"};
-
+    if (set_clusters.size() == 0) {getAll(1000);}    
+    set_clusters = set_clusters.sort{-it.value[mode].size}
+    
     filename = "output/" + filename;
     if (filename.substring(filename.length()-4, filename.length()) != ".txt") {filename += ".txt"}
-    println "\nCreating file '" + filename + "'"
+    println "\nCreating file '" + filename + "'\n"
     
-    set_clusters = set_clusters.sort{-it.value[mode].size}
+    //def textFile = new File(filename);
+    for (int i = 1; i <= set_clusters.size(); i++)
+    {
+        println "CLUSTER: " + i + "\n";
+        println "total phone numbers: \t"  + set_clusters.get(i)[1].size();
+        println "total advertisements: \t" + set_clusters.get(i)[0].size();
+        println "\nphones:";
+        set_clusters.get(i)[1].each{println it.uri;}
+        println "\nadvertisements:";
+        set_clusters.get(i)[0].each{println it.uri;}
+        println"————————————————————————————————————————————————————\n"
+    }
     /*
     array = [[],[]];
     def sizes = [];
