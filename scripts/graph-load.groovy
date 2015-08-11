@@ -1,5 +1,5 @@
 
-inputFilePath   = "input/ntriples_200000_sorted.txt"
+inputFilePath   = "input/ntriples_test.txt"
 
 ch_pound = "#"
 ch_slash = "/"
@@ -167,7 +167,7 @@ new File(inputFilePath).eachLine({
 })
 
 batch.commit()
-println "\nTotal Runtime: " + getRunTime(startTime, System.currentTimeMillis())+"\n" //HERE WE STOP
+println "\nGraph Upload completed. Total Runtime: " + getRunTime(startTime, System.currentTimeMillis())+"\n" //HERE WE STOP
 if (errorList[0]!=null) {println "Process Completed With Errors:\n"}
 for (i=0; i<err_size; i++) if (errorList[i]!=null) print errorList[i]
   

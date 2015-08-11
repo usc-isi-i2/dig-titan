@@ -66,8 +66,7 @@ getAll = {blockSize ->
     def pool    = [];         //set of ALL objects (advertisements)    
     def idx_clusters = 0;     //number of obtained clusters so far
     def idx_explored = 0;     //number of explored objects so far
-    def set_explored = [:];   //set of explored objects (advertisements) so far
-        set_clusters = [:];   //hashtable of clusterss
+    def set_explored = [:];   //set of explored objects (advertisements) so far        
     
     println "\nCollecting objects. Please wait...\n"; Thread.sleep(1000)    
     //graph.V.has("uri", com.thinkaurelius.titan.core.attribute.Text.REGEX, "[<](http)(.*)(processed>)").aggregate(pool).iterate();
@@ -88,22 +87,23 @@ getAll = {blockSize ->
             if (set_explored.containsValue(it) == false)
             {   
                 def cluster = getOne(it.uri);
-                if ((cluster[0].size() > 1) && (cluster[1].size() > 1)) 
-                    {set_clusters.put(++idx_clusters, cluster);}
+                //if ((cluster[0].size() > 1) && (cluster[1].size() > 1)) //UNCOMMENT
+                    //{
+                        set_clusters.put(++idx_clusters, cluster);
+                    //}
                 cluster[0].each {set_explored.put(++idx_explored, it);}
             }
             if (++lineNumber%blockSize == 0L){println "${lineNumber}/" + pool.size + " objects : " + getRunTime(startTime, System.currentTimeMillis())}
         }
     }
     println "\nAnalysis completed: "+idx_clusters+" cluster(s) found\n";
-    //return set_clusters;
 }
 
 output = {mode, filename->
     //About:  creates a text file with the results of complete graph search
     //Input:  mode: the way for sorting search results
-    //        1 - sort by number of ads per cluster
-    //        2 - sort by number of phones per cluster (default)
+    //        0 - sort by number of ads per cluster
+    //        1 - sort by number of phones per cluster (default)
     //Output: N/A
     
     if (set_clusters.size() == 0)
@@ -116,6 +116,25 @@ output = {mode, filename->
     filename = "output/" + filename;
     if (filename.substring(filename.length()-4, filename.length()) != ".txt") {filename += ".txt"}
     println "\nCreating file '" + filename + "'"
+    
+    set_clusters = set_clusters.sort{-it.value[mode].size}
+    /*
+    array = [[],[]];
+    def sizes = [];
+    def idxes = [];
+    
+    for (int i = 1; i <= set_clusters.size(); i++)
+    {
+        idxes[i] = i;
+        sizes[i] = set_clusters.get(i)[mode].size();
+
+        array[0] = array[0] + i;
+    }
+    array = [idxes, sizes]
+    */
+
+    
+
 
     // 1. CREATE ARRAY OF ADS GROUPPED BY CLUSTERS
     // 2. SORT THAT ARRAY
@@ -126,5 +145,6 @@ edge1 = '<http://memexproxy.com/ontology/hasFeatureCollection>';
 edge2 = '<http://memexproxy.com/ontology/phonenumber_feature>';
 edge3 = '<http://memexproxy.com/ontology/featureObject>';
 
+set_clusters = [:];
 graph = TitanFactory.open('conf/titan-berkeleydb.properties');
 println "\nGraph loaded successfully. Type info() for help."
