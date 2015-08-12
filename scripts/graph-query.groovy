@@ -10,7 +10,12 @@ info = {
     println "Get number of detected clusters:\tset_clusters.size()"
     println "Get summary for the i-th cluster:\tset_clusters.get(i)"
     println "List URI of ads in the i-th cluster:\tset_clusters.get(i)[0].uri"
-    println "List URI of phones the in i-th cluster:\tset_clusters.get(i)[1].uri\n"
+    println "List URI of phones the in i-th cluster:\tset_clusters.get(i)[1].uri"
+
+    println "\n====== WRITE TO FILE ======"
+    println "If you want to save results to disk, type writeFile('mode', 'filename')"
+    println "mode - the way of sorting clustered blocks"
+    println "filename - name of the local file on disk\n"
 }
 
 getRunTime = {beginTime, endTime -> 
@@ -80,7 +85,7 @@ getAll = {blockSize ->
     {
         startTime = System.currentTimeMillis();
         if (blockSize == null || blockSize == 0) {blockSize = 100000};
-        println "\n"+pool.size+" objects collected. Begin analyzing...\n";
+        println pool.size+" objects collected. Begin analyzing...\n";
 
         def lineNumber = 0L;
         pool.each {
@@ -99,15 +104,17 @@ getAll = {blockSize ->
     println "\nAnalysis completed: "+idx_clusters+" cluster(s) found\n";
 }
 
-output = {mode, filename->
+writeFile = {mode, filename->
     //About:  creates a text file with the results of complete graph search
     //Input:  mode: the way for sorting search results
     //        0 - sort by number of ads per cluster
     //        1 - sort by number of phones per cluster (default)
     //Output: N/A
     
+    def sorted_keys = [0]
     if (set_clusters.size() == 0) {getAll(1000);}    
     set_clusters = set_clusters.sort{-it.value[mode].size}
+    set_clusters.each{sorted_keys.add(it.key)}
     
     def boolean overwrife_file = true;
     if (filename.substring(filename.length()-4, filename.length()) != ".txt") {filename += ".txt"}
@@ -131,12 +138,12 @@ output = {mode, filename->
         for (int i = 1; i <= set_clusters.size(); i++)
         {
             textFile.append "CLUSTER " + i + "\n\n";
-            textFile.append "total phone numbers: \t"  + set_clusters.get(i)[1].size() + "\n";
-            textFile.append "total advertisements: \t" + set_clusters.get(i)[0].size() + "\n";
+            textFile.append "total phone numbers: \t"  + set_clusters.get(sorted_keys[i])[1].size() + "\n";
+            textFile.append "total advertisements: \t" + set_clusters.get(sorted_keys[i])[0].size() + "\n";
             textFile.append "\nphones:\n";
-            set_clusters.get(i)[1].each{textFile.append it.uri + "\n";}
+            set_clusters.get(sorted_keys[i])[1].each{textFile.append it.uri + "\n";}
             textFile.append "\nadvertisements:\n";
-            set_clusters.get(i)[0].each{textFile.append it.uri + "\n";}
+            set_clusters.get(sorted_keys[i])[0].each{textFile.append it.uri + "\n";}
             textFile.append"————————————————————————————————————————————————————\n"
         }
         println "\nFile '" + filename + " created."

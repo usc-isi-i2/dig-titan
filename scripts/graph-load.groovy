@@ -1,5 +1,5 @@
 
-inputFilePath   = "input/ntriples_test.txt"
+inputFilePath   = "input/ntriples_100K.txt"
 
 ch_pound = "#"
 ch_slash = "/"
