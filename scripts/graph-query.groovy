@@ -55,7 +55,7 @@ getOne = {uri ->
     def ads=[];    //set of advertisements in the group
     def phones=[]; //set of phone numbers in the group
 
-    graph.V().has('uri',uri.toString()).as('start').aggregate(ads).outE.has('uri',edge1).inV.outE.has('uri',edge2).inV.outE().has('uri',edge3).as('e').inV().except(phones).filter {v, m -> v.inE().has('uri',edge3).except([m.e]).hasNext()}.store(phones).inE.has('uri',edge3).except('e').outV().inE.has('uri',edge2).outV.inE.has('uri',edge1).outV/*.except(ads)*/.loop('start') {true}.iterate();
+    graph.V().has('uri',uri.toString()).as('start').aggregate(ads).outE.has('uri',edge1).inV.outE.has('uri',edge2).inV.outE().has('uri',edge3).as('e').inV().except(phones).filter {v, m -> v.inE().has('uri',edge3).except([m.e]).hasNext()}.store(phones).inE.has('uri',edge3).except('e').outV().inE.has('uri',edge2).outV.inE.has('uri',edge1).outV.except(ads).loop('start') {true}.iterate();
     return [ads, phones];
 }
 
